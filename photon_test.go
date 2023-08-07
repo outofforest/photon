@@ -32,21 +32,21 @@ func TestPhoton(t *testing.T) {
 	requireT := require.New(t)
 
 	photon1 := NewFromValue(msg)
-	requireT.Equal(msg, photon1.Value)
+	requireT.Equal(msg, photon1.V)
 	requireT.Equal(
 		[]byte{0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0xff, 0x0, 0x0, 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-		photon1.Bytes,
+		photon1.B,
 	)
 
-	photon2 := NewFromBytes[msg1](photon1.Bytes)
-	requireT.Equal(photon1.Bytes, photon2.Bytes)
-	requireT.Equal(msg, photon2.Value)
+	photon2 := NewFromBytes[msg1](photon1.B)
+	requireT.Equal(photon1.B, photon2.B)
+	requireT.Equal(msg, photon2.V)
 
-	buf := bytes.NewBuffer(photon1.Bytes)
+	buf := bytes.NewBuffer(photon1.B)
 	photon3, err := NewFromReader[msg1](buf)
 	requireT.NoError(err)
-	requireT.Equal(photon1.Bytes, photon3.Bytes)
-	requireT.Equal(msg, photon3.Value)
+	requireT.Equal(photon1.B, photon3.B)
+	requireT.Equal(msg, photon3.V)
 }
 
 func TestFromTooSmallBytes(t *testing.T) {
