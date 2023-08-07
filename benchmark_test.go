@@ -27,7 +27,7 @@ func BenchmarkFromBytes(b *testing.B) {
 
 	m := &msg{Field: math.MaxUint64}
 	ph := NewFromValue(m)
-	raw := ph.Bytes
+	raw := ph.B
 
 	b.ResetTimer()
 	for i := 0; i < 10000; i++ {
@@ -45,7 +45,7 @@ func BenchmarkFromReader(b *testing.B) {
 
 	m := &msg{Field: math.MaxUint64}
 	ph := NewFromValue(m)
-	buf := bytes.NewBuffer(bytes.Repeat(ph.Bytes, loop))
+	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
 
 	b.ResetTimer()
 	for i := 0; i < loop; i++ {
