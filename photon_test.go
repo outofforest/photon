@@ -71,5 +71,6 @@ func TestFromReaderError(t *testing.T) {
 
 	ph, err := NewFromReader[msg](buf)
 	requireT.ErrorIs(err, io.EOF)
-	requireT.Nil(ph)
+	requireT.Nil(ph.B)
+	requireT.Nil(ph.V)
 }

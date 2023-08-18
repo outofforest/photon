@@ -14,27 +14,27 @@ type Union[T comparable] struct {
 }
 
 // NewFromBytes creates union from bytes.
-func NewFromBytes[T comparable](b []byte) *Union[T] {
+func NewFromBytes[T comparable](b []byte) Union[T] {
 	var v T
-	return &Union[T]{
+	return Union[T]{
 		B: b[:unsafe.Sizeof(v)],
 		V: (*T)(unsafe.Pointer(&b[0])),
 	}
 }
 
 // NewFromValue creates union from value.
-func NewFromValue[T comparable](v *T) *Union[T] {
-	return &Union[T]{
+func NewFromValue[T comparable](v *T) Union[T] {
+	return Union[T]{
 		B: unsafe.Slice((*byte)(unsafe.Pointer(v)), unsafe.Sizeof(*v)),
 		V: v,
 	}
 }
 
 // NewFromReader creates union from bytes read from the reader.
-func NewFromReader[T comparable](r io.Reader) (*Union[T], error) {
+func NewFromReader[T comparable](r io.Reader) (Union[T], error) {
 	var v T
 	b := make([]byte, unsafe.Sizeof(v))
-	p := &Union[T]{
+	p := Union[T]{
 		B: b,
 		V: (*T)(unsafe.Pointer(&b[0])),
 	}
@@ -47,7 +47,7 @@ func NewFromReader[T comparable](r io.Reader) (*Union[T], error) {
 			return p, nil
 		}
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return Union[T]{}, errors.WithStack(err)
 		}
 		b = b[n:]
 	}
