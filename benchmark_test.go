@@ -53,3 +53,51 @@ func BenchmarkFromReader(b *testing.B) {
 	}
 	b.StopTimer()
 }
+
+func BenchmarkFromSlice(b *testing.B) {
+	type msg struct {
+		Field uint64
+	}
+
+	m := []msg{{Field: math.MaxUint64}}
+
+	b.ResetTimer()
+	for i := 0; i < 10000; i++ {
+		NewFromSlice(m)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkSliceFromBytes(b *testing.B) {
+	type msg struct {
+		Field uint64
+	}
+
+	m := []msg{{Field: math.MaxUint64}}
+	ph := NewFromSlice(m)
+	raw := ph.B
+
+	b.ResetTimer()
+	for i := 0; i < 10000; i++ {
+		NewSliceFromBytes[msg](raw)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkSliceFromReader(b *testing.B) {
+	type msg struct {
+		Field uint64
+	}
+
+	const loop = 10000
+
+	m := []msg{{Field: math.MaxUint64}}
+	ph := NewFromSlice(m)
+	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
+
+	b.ResetTimer()
+	for i := 0; i < loop; i++ {
+		_, _ = NewSliceFromReader[msg](buf, 1)
+	}
+	b.StopTimer()
+}
