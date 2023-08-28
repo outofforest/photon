@@ -6,21 +6,32 @@ import (
 	"testing"
 )
 
+// go test -bench=. -run=^$ -cpuprofile profile.out
+// go tool pprof -http="localhost:8000" pprofbin ./profile.out
+
 func BenchmarkFromValue(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
 
 	m := &msg{Field: math.MaxUint64}
 
-	b.ResetTimer()
-	for i := 0; i < 10000; i++ {
-		NewFromValue(m)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < 10000; i++ {
+			NewFromValue(m)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
 
 func BenchmarkFromBytes(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
@@ -29,14 +40,19 @@ func BenchmarkFromBytes(b *testing.B) {
 	ph := NewFromValue(m)
 	raw := ph.B
 
-	b.ResetTimer()
-	for i := 0; i < 10000; i++ {
-		NewFromBytes[msg](raw)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < 10000; i++ {
+			NewFromBytes[msg](raw)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
 
 func BenchmarkFromReader(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
@@ -47,28 +63,38 @@ func BenchmarkFromReader(b *testing.B) {
 	ph := NewFromValue(m)
 	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
 
-	b.ResetTimer()
-	for i := 0; i < loop; i++ {
-		_, _ = NewFromReader[msg](buf)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < loop; i++ {
+			_, _ = NewFromReader[msg](buf)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
 
 func BenchmarkFromSlice(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
 
 	m := []msg{{Field: math.MaxUint64}}
 
-	b.ResetTimer()
-	for i := 0; i < 10000; i++ {
-		NewFromSlice(m)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < 10000; i++ {
+			NewFromSlice(m)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
 
 func BenchmarkSliceFromBytes(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
@@ -77,14 +103,19 @@ func BenchmarkSliceFromBytes(b *testing.B) {
 	ph := NewFromSlice(m)
 	raw := ph.B
 
-	b.ResetTimer()
-	for i := 0; i < 10000; i++ {
-		NewSliceFromBytes[msg](raw)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < 10000; i++ {
+			NewSliceFromBytes[msg](raw)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
 
 func BenchmarkSliceFromReader(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
 	type msg struct {
 		Field uint64
 	}
@@ -95,9 +126,11 @@ func BenchmarkSliceFromReader(b *testing.B) {
 	ph := NewFromSlice(m)
 	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
 
-	b.ResetTimer()
-	for i := 0; i < loop; i++ {
-		_, _ = NewSliceFromReader[msg](buf, 1)
+	for bi := 0; bi < b.N; bi++ {
+		b.StartTimer()
+		for i := 0; i < loop; i++ {
+			_, _ = NewSliceFromReader[msg](buf, 1)
+		}
+		b.StopTimer()
 	}
-	b.StopTimer()
 }
