@@ -52,6 +52,8 @@ func TestValue(t *testing.T) {
 	requireT.NoError(err)
 	requireT.Equal(photon1.B, photon3.B)
 	requireT.Equal(msg, photon3.V)
+
+	requireT.Equal(msg, FromBytes[msg1](photon1.B))
 }
 
 func TestFromTooSmallBytes(t *testing.T) {
@@ -59,6 +61,10 @@ func TestFromTooSmallBytes(t *testing.T) {
 
 	requireT.Panics(func() {
 		NewFromBytes[msg](make([]byte, 1))
+	})
+
+	requireT.Panics(func() {
+		FromBytes[msg](make([]byte, 1))
 	})
 }
 
@@ -71,6 +77,10 @@ func TestFromNilBytes(t *testing.T) {
 
 	requireT.Panics(func() {
 		NewFromBytes[msg](nil)
+	})
+
+	requireT.Panics(func() {
+		FromBytes[msg](nil)
 	})
 }
 
@@ -129,7 +139,7 @@ func TestSlice(t *testing.T) {
 		photon1.B,
 	)
 
-	photon2 := NewSliceFromBytes[msg1](photon1.B)
+	photon2 := NewSliceFromBytes[msg1](photon1.B, len(msgs))
 	requireT.Equal(photon1.B, photon2.B)
 	requireT.Equal(msgs, photon2.V)
 
@@ -138,13 +148,19 @@ func TestSlice(t *testing.T) {
 	requireT.NoError(err)
 	requireT.Equal(photon1.B, photon3.B)
 	requireT.Equal(msgs, photon3.V)
+
+	requireT.Equal(msgs, SliceFromBytes[msg1](photon1.B, len(msgs)))
 }
 
 func TestSliceFromTooSmallBytes(t *testing.T) {
 	requireT := require.New(t)
 
 	requireT.Panics(func() {
-		NewSliceFromBytes[msg](make([]byte, 1))
+		NewSliceFromBytes[msg](make([]byte, 1), 1)
+	})
+
+	requireT.Panics(func() {
+		SliceFromBytes[msg](make([]byte, 1), 1)
 	})
 }
 
@@ -152,7 +168,11 @@ func TestSliceFromNilBytes(t *testing.T) {
 	requireT := require.New(t)
 
 	requireT.Panics(func() {
-		NewSliceFromBytes[msg](nil)
+		NewSliceFromBytes[msg](nil, 1)
+	})
+
+	requireT.Panics(func() {
+		SliceFromBytes[msg](nil, 1)
 	})
 }
 
@@ -213,7 +233,7 @@ func TestSliceBytesAreUpdated(t *testing.T) {
 	requireT.NotEqual(byteCopy, photon1.B)
 
 	copy(byteCopy, photon1.B)
-	photon2 := NewSliceFromBytes[msg](photon1.B)
+	photon2 := NewSliceFromBytes[msg](photon1.B, 1)
 	photon2.V[0].Field++
 	requireT.NotEqual(byteCopy, photon2.B)
 

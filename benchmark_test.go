@@ -106,7 +106,7 @@ func BenchmarkSliceFromBytes(b *testing.B) {
 	for bi := 0; bi < b.N; bi++ {
 		b.StartTimer()
 		for i := 0; i < 10000; i++ {
-			NewSliceFromBytes[msg](raw)
+			NewSliceFromBytes[msg](raw, len(ph.V))
 		}
 		b.StopTimer()
 	}
