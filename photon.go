@@ -15,10 +15,10 @@ type Union[T any] struct {
 
 // NewFromBytes creates union from bytes.
 func NewFromBytes[T comparable](b []byte) Union[*T] {
-	var v T
+	b, v := fromBytes[T](b)
 	return Union[*T]{
-		B: b[:unsafe.Sizeof(v)],
-		V: (*T)(unsafe.Pointer(&b[0])),
+		B: b,
+		V: v,
 	}
 }
 
@@ -54,18 +54,12 @@ func NewFromReader[T comparable](r io.Reader) (Union[*T], error) {
 }
 
 // NewSliceFromBytes creates union containing slice from bytes.
-func NewSliceFromBytes[T comparable](b []byte) Union[[]T] {
-	var v T
-	itemSize := int(unsafe.Sizeof(v))
-	n := len(b) / itemSize
-
-	if n == 0 {
-		panic("byte slice is too small")
-	}
+func NewSliceFromBytes[T comparable](b []byte, n int) Union[[]T] {
+	b, v := sliceFromBytes[T](b, n)
 
 	return Union[[]T]{
-		B: b[:itemSize*n],
-		V: unsafe.Slice((*T)(unsafe.Pointer(&b[0])), n),
+		B: b,
+		V: v,
 	}
 }
 
@@ -101,4 +95,28 @@ func NewSliceFromReader[T comparable](r io.Reader, n int) (Union[[]T], error) {
 		}
 		b = b[n:]
 	}
+}
+
+// FromBytes converts byte slice to *T.
+func FromBytes[T comparable](b []byte) *T {
+	_, v := fromBytes[T](b)
+	return v
+}
+
+// SliceFromBytes converts byte slice to slice of type T.
+func SliceFromBytes[T comparable](b []byte, n int) []T {
+	_, v := sliceFromBytes[T](b, n)
+	return v
+}
+
+func fromBytes[T comparable](b []byte) ([]byte, *T) {
+	var v T
+	b = b[:unsafe.Sizeof(v)]
+	return b, (*T)(unsafe.Pointer(&b[0]))
+}
+
+func sliceFromBytes[T comparable](b []byte, n int) ([]byte, []T) {
+	var v T
+	b = b[:n*int(unsafe.Sizeof(v))]
+	return b, unsafe.Slice((*T)(unsafe.Pointer(&b[0])), n)
 }
