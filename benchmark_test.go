@@ -1,15 +1,19 @@
+//nolint:ineffassign,staticcheck,wastedassign
 package photon
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"math"
 	"testing"
+	"unsafe"
 )
 
-// go test -bench=. -run=^$ -cpuprofile profile.out
+// go test -benchtime=1000x -bench=. -run=^$ -cpuprofile profile.out
 // go tool pprof -http="localhost:8000" pprofbin ./profile.out
 
-func BenchmarkFromValue(b *testing.B) {
+func BenchmarkNewFromValue(b *testing.B) {
 	b.StopTimer()
 	b.ResetTimer()
 
@@ -19,13 +23,422 @@ func BenchmarkFromValue(b *testing.B) {
 
 	m := &msg{Field: math.MaxUint64}
 
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < 10000; i++ {
-			NewFromValue(m)
-		}
-		b.StopTimer()
+	var v Union[*msg]
+
+	b.StartTimer()
+	for range b.N {
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
+		v = NewFromValue(m)
 	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkNewFromBytes(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
+
+	m := &msg{Field: math.MaxUint64}
+	ph := NewFromValue(m)
+	raw := ph.B
+
+	var v Union[*msg]
+
+	b.StartTimer()
+	for range b.N {
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+		v = NewFromBytes[msg](raw)
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkNewFromReader(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
+
+	m := &msg{Field: math.MaxUint64}
+	ph := NewFromValue(m)
+	buf := bytes.NewBuffer(bytes.Repeat(ph.B, 10*b.N))
+
+	var v Union[*msg]
+
+	b.StartTimer()
+	for range b.N {
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+		v, _ = NewFromReader[msg](buf)
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkNewFromSlice(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
+
+	m := []msg{{Field: math.MaxUint64}}
+
+	var v Union[[]msg]
+
+	b.StartTimer()
+	for range b.N {
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+		v = NewFromSlice(m)
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkNewSliceFromBytes(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
+
+	m := []msg{{Field: math.MaxUint64}}
+	ph := NewFromSlice(m)
+	raw := ph.B
+
+	var v Union[[]msg]
+
+	b.StartTimer()
+	for range b.N {
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+		v = NewSliceFromBytes[msg](raw, len(ph.V))
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkNewSliceFromReader(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
+
+	m := []msg{{Field: math.MaxUint64}}
+	ph := NewFromSlice(m)
+	buf := bytes.NewBuffer(bytes.Repeat(ph.B, 10*b.N))
+
+	var v Union[[]msg]
+
+	b.StartTimer()
+	for range b.N {
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+		v, _ = NewSliceFromReader[msg](buf, 1)
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
 }
 
 func BenchmarkFromBytes(b *testing.B) {
@@ -40,55 +453,64 @@ func BenchmarkFromBytes(b *testing.B) {
 	ph := NewFromValue(m)
 	raw := ph.B
 
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < 10000; i++ {
-			NewFromBytes[msg](raw)
-		}
-		b.StopTimer()
-	}
-}
+	var v *msg
 
-func BenchmarkFromReader(b *testing.B) {
+	b.StartTimer()
+	for range b.N {
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+		v = FromBytes[msg](raw)
+	}
 	b.StopTimer()
-	b.ResetTimer()
 
-	type msg struct {
-		Field uint64
-	}
-
-	const loop = 10000
-
-	m := &msg{Field: math.MaxUint64}
-	ph := NewFromValue(m)
-	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
-
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < loop; i++ {
-			_, _ = NewFromReader[msg](buf)
-		}
-		b.StopTimer()
-	}
-}
-
-func BenchmarkFromSlice(b *testing.B) {
-	b.StopTimer()
-	b.ResetTimer()
-
-	type msg struct {
-		Field uint64
-	}
-
-	m := []msg{{Field: math.MaxUint64}}
-
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < 10000; i++ {
-			NewFromSlice(m)
-		}
-		b.StopTimer()
-	}
+	_, _ = fmt.Fprint(io.Discard, v)
 }
 
 func BenchmarkSliceFromBytes(b *testing.B) {
@@ -103,16 +525,67 @@ func BenchmarkSliceFromBytes(b *testing.B) {
 	ph := NewFromSlice(m)
 	raw := ph.B
 
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < 10000; i++ {
-			NewSliceFromBytes[msg](raw, len(ph.V))
-		}
-		b.StopTimer()
+	var v []msg
+
+	b.StartTimer()
+	for range b.N {
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
+		v = SliceFromBytes[msg](raw, len(ph.V))
 	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
 }
 
-func BenchmarkSliceFromReader(b *testing.B) {
+func BenchmarkFromPointer(b *testing.B) {
 	b.StopTimer()
 	b.ResetTimer()
 
@@ -120,17 +593,138 @@ func BenchmarkSliceFromReader(b *testing.B) {
 		Field uint64
 	}
 
-	const loop = 10000
+	m := &msg{Field: math.MaxUint64}
+	ph := NewFromValue(m)
+	raw := unsafe.Pointer(&ph.B[0])
+
+	var v *msg
+
+	b.StartTimer()
+	for range b.N {
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+		v = FromPointer[msg](raw)
+	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
+}
+
+func BenchmarkSliceFromPointer(b *testing.B) {
+	b.StopTimer()
+	b.ResetTimer()
+
+	type msg struct {
+		Field uint64
+	}
 
 	m := []msg{{Field: math.MaxUint64}}
 	ph := NewFromSlice(m)
-	buf := bytes.NewBuffer(bytes.Repeat(ph.B, loop))
+	raw := unsafe.Pointer(&ph.B[0])
 
-	for bi := 0; bi < b.N; bi++ {
-		b.StartTimer()
-		for i := 0; i < loop; i++ {
-			_, _ = NewSliceFromReader[msg](buf, 1)
-		}
-		b.StopTimer()
+	var v []msg
+
+	b.StartTimer()
+	for range b.N {
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
+		v = SliceFromPointer[msg](raw, len(ph.V))
 	}
+	b.StopTimer()
+
+	_, _ = fmt.Fprint(io.Discard, v)
 }

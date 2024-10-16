@@ -103,10 +103,20 @@ func FromBytes[T comparable](b []byte) *T {
 	return v
 }
 
+// FromPointer converts pointer to byte slice to *T.
+func FromPointer[T comparable](p unsafe.Pointer) *T {
+	return (*T)(p)
+}
+
 // SliceFromBytes converts byte slice to slice of type T.
 func SliceFromBytes[T comparable](b []byte, n int) []T {
 	_, v := sliceFromBytes[T](b, n)
 	return v
+}
+
+// SliceFromPointer converts pointer to byte slice to slice of type T.
+func SliceFromPointer[T comparable](p unsafe.Pointer, n int) []T {
+	return unsafe.Slice((*T)(p), n)
 }
 
 func fromBytes[T comparable](b []byte) ([]byte, *T) {
